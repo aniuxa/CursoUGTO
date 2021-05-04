@@ -24,6 +24,10 @@ Dra. Ana Ruth Escoto Castillo - FCPyS - UNAM
 
 * [Cápsula de introducción a R (opcional)](https://www.youtube.com/watch?v=HR2MXwrzt00)
 
+Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no tener problema con instalaciones
+
+[Proyecto](https://rstudio.cloud/project/2518736)
+
 
 ## Contenido
 
