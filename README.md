@@ -1,5 +1,5 @@
 
-# Taller de Inducción a R
+# Taller de Inducción a R - Universidad de Guanajuato
 
 Este curso se imparte en mayo y junio de 2021
 
