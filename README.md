@@ -2,6 +2,9 @@
 # Taller de Inducción a R - Universidad de Guanajuato
 
 Este curso se imparte en mayo y junio de 2021
+12 horas en 3 sesiones
+
+Dra. Ana Ruth Escoto Castillo - FCPyS - UNAM
 
 ## Objetivo general
 *	Ampliar las habilidades para el diseño y ejecución de la investigación social cuantitativa en los y las estudiantes a través de la discusión de elementos teóricos y metodológicos, así como la puesta en práctica de ejemplos con información secundaria y su interpretación con la herramienta de software libre, R, de acceso gratuito y de código abierto.  
@@ -38,7 +41,7 @@ c. Introducción al programa y a la idea de programación por objetos
 [Práctica 1](P1.md) 
 
 
-### II.	Estadística descriptiva usando LAPOP (6 horas)
+### II.	Estadística descriptiva usando LAPOPMX (6 horas)
 
 #### *Sesión 2:*
 
