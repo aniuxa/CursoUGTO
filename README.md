@@ -43,7 +43,7 @@ c. Introducción al programa y a la idea de programación por objetos
 
 
 [Práctica 1](P1.md) 
-
+[Grabación sesión 1](https://drive.google.com/drive/folders/1uThkoeZC406kXAsHrlL1wAJsj2tvJI1L?usp=sharing)
 
 ### II.	Estadística descriptiva usando LAPOPMX (6 horas)
 
