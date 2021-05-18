@@ -58,6 +58,9 @@ i.	Univarida
 
 ii.	Bivariada
 
+[Práctica 2](P2.md)
+
+[Código](P2.R)
 
 #### *Sesión 3*
 
