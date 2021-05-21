@@ -48,6 +48,7 @@ c. Introducción al programa y a la idea de programación por objetos
 
 [Envío de ejercicio 1](https://forms.gle/Q5fECvC68W5KR9sU6) 
 
+
 ### II.	Estadística descriptiva usando LAPOPMX (6 horas)
 
 #### *Sesión 2:*
@@ -61,6 +62,10 @@ ii.	Bivariada
 [Práctica 2](P2.md)
 
 [Código](P2.R)
+
+[Grabación sesión 2](https://drive.google.com/drive/folders/12aD1bwdCdE8sCM1fZ7m1QnP8owBuPyLu?usp=sharing)
+
+[Envío de ejercicio 2](https://forms.gle/HveGeLxTCzf64Ksm8)
 
 #### *Sesión 3*
 
