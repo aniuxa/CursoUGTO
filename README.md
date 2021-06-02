@@ -80,4 +80,6 @@ d.	Manipulación de bases de datos y visualización gráfica, continuación  (2 
 
 i.	Gráficos multivariados
 
+[Práctica 3](P3.md)
 
+[Código](P3.R)
