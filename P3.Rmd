@@ -1,0 +1,466 @@
+---
+title: "Práctica 3 - Más gráficos + Indicadores sumativos"
+author: "Ana Escoto"
+date: "02/06/2021"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Previo
+
+```{r echo=F}
+setwd("C:\\Users\\anaes\\Dropbox\\2021\\CursoUGTO\\CursoUGTO")
+```
+
+
+```{r}
+if (!require("pacman")) install.packages("pacman") # instala pacman si se requiere
+pacman::p_load(tidyverse, readxl,haven, sjlabelled, janitor, srvyr, esquisse, RColorBrewer) #carga los paquetes necesarios para esta práctica
+```
+
+Por si no tuviéramos cargada la base de datos, la volveremos a cargar
+```{r}
+lapop2019 <- read_dta("./datos/lapop2019.dta")
+```
+
+También vamos usar la base de Índice de Competitividad Internacional ICI, desarrollado por el Instituto Mexicano de Competitividad. (véase  http://imco.org.mx/indices/mexico-suenos-sin-oportunidad/)
+
+```{r}
+ICI_2018 <- read_excel("./datos/ICI_2018.xlsx", sheet = "para_importar")
+ICI_2018 <- clean_names(ICI_2018) # limpia los nombres
+```
+
+
+# ¿Cuál es el mejor gráfico?
+Hay cursos específicos de visualización de datos. Es maravilloso pero también requiere que estudiemos bien qué tipo de datos tenemos y cuáles son nuestros objetivos. 
+
+Me gusta mucho este recurso: <https://www.data-to-viz.com/>
+
+# Gráficos de base
+
+"plot()" Es la función más simple. Y es otro comando "listo"
+
+```{r}
+  plot(as_label(lapop2019$soct2))
+```
+
+Esto es igual que:
+
+```{r}
+barplot(table(as_label(lapop2019$soct2)))
+```
+
+```{r}
+  plot(as_label(lapop2019$soct2), 
+       main=paste(get_label(lapop2019$soct2)))
+```
+
+También tnemos histograma y el boxplot.
+
+```{r}
+hist(ICI_2018$esperanza_de_vida)
+```
+
+
+```{r}
+boxplot(ICI_2018$esperanza_de_vida)
+```
+
+
+# Gráficos con ggplot
+
+Hoy vamos a presentar a un gran paquete ¡Es de los famosos! Y tiene más de diez años.
+
+* <https://qz.com/1007328/all-hail-ggplot2-the-code-powering-all-those-excellent-charts-is-10-years-old/>
+
+"gg" proviene de "Grammar of Graphics", funciona un poco como sintácticamente, de ahí su nombre.
+
+Algunos recursos para aprender ggplot
+
+* <https://ggplot2-book.org/> hecha por el mero mero.
+
+* <http://sape.inf.usi.ch/quick-reference/ggplot2> 
+
+* <https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization-2.1.pdf>
+
+Vamos a revisar una presentación que es muy interesante
+
+* <https://evamaerey.github.io/ggplot2_grammar_guide/ggplot2_grammar_guide.html>
+
+* <https://huygens.science.uva.nl/ggPlotteR/> Hace gráficos de ggplot con la base de datos de Gapminder
+
+# Un lienzo para dibujar
+
+Para hacer un gráfico, ggplot2 tiene el comando "ggplot()".  Hacer gráficos con esta función tiene una lógica  aditiva. Lo ideal es que iniciemos estableciendo el mapeo estético de nuestro gráfico, con el comando aes()
+
+```{r}
+g1<-lapop2019 %>%
+  ggplot(aes(as_label(soct2)))
+
+g1 # imprime el lienzo
+```
+
+
+
+# Gráficos univariados
+
+## Para cualitativas
+
+```{r}
+g1 + geom_bar()
+```
+
+
+```{r}
+g1 +  geom_bar(aes(
+  fill = as_label(q1)
+  )) # colorea la geometría
+
+# Esto es equivalente
+
+lapop2019 %>%
+  ggplot(aes(as_label(soct2),
+             fill = as_label(q1)
+             )
+         ) + geom_bar()
+
+```
+## Para variables cuantitativas
+Podemos hacer histogramas y gráficos de densidad, de manera fácil. La idea es agregar en nuestro "lienzo" una geometría, un valor para dibujar en él. Esto se agrega con un "+" y con la figura que se añadirá a nuestro gráfico.
+
+```{r}
+g2<-lapop2019 %>%
+  ggplot(aes(ed))
+
+g2 # imprime el lienzo
+```
+
+### Histograma
+```{r}
+g2 + geom_histogram() 
+```
+No es igual al histograma de base por el número de "cajas". Esto lo podemos modificar:
+
+```{r}
+g2 + geom_histogram(bins=10) 
+
+```
+
+
+### Densidad
+```{r}
+g2 + geom_density()
+```
+
+
+# Gráficos bivariados
+
+## Cuali-cuali
+
+
+```{r}
+g1 +  geom_bar(aes(fill = as_label(q1)),
+              position="dodge") #pone las categorías lado a lado y no apiladas
+
+```
+
+Otra manera interesante de observar estas variables, es que estándo apiladas, cada categoría de escolaridad se entendiera como una unidad:
+
+```{r}
+g_bivariado <- g1 +  geom_bar(aes(fill = as_label(q1)),
+              position="fill") # cada categoría "llena" a una unidad
+
+g_bivariado
+```
+
+Escalas de color: RcolorBrewer es el más famoso.
+
+
+```{r}
+
+g_bivariado + scale_fill_brewer(palette = "Dark2")
+```
+
+Cambiamos el tema:
+
+```{r}
+g_bivariado + scale_fill_brewer(palette = "Dark2") + theme_minimal()
+
+```
+
+## Cuanti - cuanti
+
+Los gráficos más usuales son los _scatter plot_
+
+```{r}
+
+ICI_2018 %>% 
+  ggplot(aes(indice_de_gini,
+             indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_point()
+
+
+
+```
+
+Hay otra geometría que puede ser útil: la geometría "jitter"
+```{r}
+
+ICI_2018 %>% 
+  ggplot(aes(indice_de_gini,
+             indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_jitter()
+
+
+```
+En lugar de puntos podemos incluir texto:
+
+```{r}
+# geometría "text"
+
+ICI_2018 %>% 
+  ggplot(aes(indice_de_gini,indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_text(aes(label=indicador))
+
+
+# geometría "label"
+
+ICI_2018 %>% 
+  ggplot(aes(indice_de_gini,indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_label(aes(label=indicador))
+
+
+```
+
+### Una tercera variable
+Aprovechamos para etiquetar
+
+```{r}
+etiqueta<-c("No miembro", "Miembro")
+ICI_2018<-ICI_2018 %>% 
+  set_labels(miembro_de_la_alianza_para_el_gobierno_abierto, labels=etiqueta)
+  
+```
+
+¿Ese nombre nos es útil? Está larguísimo. Podemos renombrar:
+
+```{r}
+ICI_2018<-ICI_2018 %>% 
+  dplyr::rename(miembros_al=miembro_de_la_alianza_para_el_gobierno_abierto)
+```
+
+
+Una vez ya etiquetada vamos incluirlo como un punto diferente por color o por forma:
+
+```{r}
+
+# Introducción de una tercera variable con color
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico,
+             color=as_label(miembros_al))
+         ) +
+  geom_point()
+
+# Introducción de una tercera variable con "shape"
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico,
+             shape=as_label(miembros_al))
+  ) +
+  geom_point() # ojo, hay un límite para las formas
+
+
+```
+
+
+### Más variables con "facets"
+
+Podemos introducirt más variable con "facet". Sobre todo si no son tantas categorías. Hay tres tipos de facets. 
+
+_facet_wrap_:
+
+
+```{r}
+
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_point() + facet_wrap(~as_label(miembros_al))
+
+
+```
+
+_facet_grid_: Nos permite colocar en filas o en columnas.
+
+```{r}
+
+# columnas 
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_point() + facet_grid(.~as_label(miembros_al))
+
+#filas 
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_point() +
+  facet_grid(as_label(miembros_al)~.)
+
+```
+
+### Suavizamiento
+Hay que tener cuidado ¿podemos ver todas las relaciones?
+
+```{r}
+
+# Smooth 
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  facet_grid(as_label(miembros_al)~.)
+
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico,
+             color=as_label(miembros_al))) +
+  geom_text(aes(label=indicador)) +
+  geom_smooth(method="lm") + scale_fill_brewer(palette = "Dark2") +
+  theme_minimal()
+
+
+```
+
+
+### Muchas más variables
+
+Hay que tener cuidado ¿Podemos ver todas estas variables?
+
+```{r}
+# Introducción de una cuarta variable cuanti
+  
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico,
+             color=as_label(miembros_al))) +
+  geom_point(aes(size=crecimiento_del_pib))+ # ojo
+  theme_minimal()
+
+# Equivalente  
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico,
+             color=as_label(miembros_al),
+             size=crecimiento_del_pib)) +
+  geom_point()+ 
+  theme_minimal()
+
+# Agregaremos etiquetas
+
+ICI_2018 %>% 
+  ggplot(aes(x=indice_de_gini,
+             y=indice_de_vulnerabilidad_a_efectos_del_cambio_climatico,
+             color=as_label(miembros_al),
+             size=crecimiento_del_pib)) +
+  geom_text(aes(label=indicador),
+            check_overlap = TRUE)+
+  theme_minimal()
+```
+
+# Cuanti y cuali
+
+Para ello vamos a tomar como base la variable cuanti e introduciremos capas donde definimos la variable cualitativa. 
+
+Volvamos a lapop2019
+
+```{r}
+lapop2019 %>%
+  ggplot(aes(ed)) # años de escolaridad
+```
+
+```{r}
+lapop2019 %>%
+  ggplot(aes(x=ed, fill=as_label(q1))) 
+```
+
+
+```{r}
+lapop2019 %>%
+  ggplot(aes(x=ed, fill=as_label(q1))) + geom_density()
+```
+
+
+```{r}
+
+# Modificamos la opacidad
+lapop2019 %>%
+  ggplot(aes(x=ed, 
+             fill=as_label(q1),
+             alpha=I(0.5))) + geom_density() + theme_minimal()
+```
+
+
+# Indicadores
+
+Vamos a hacer un pequeño índice sobre la confianza en las instituciones
+
+
+![1](lapop1.png)
+
+![2](lapop2.png) 
+
+```{r}
+lapop2019 %>% 
+ names()
+
+lapop2019 %>% 
+  select(starts_with("b")) %>% 
+  names()
+```
+```{r}
+lapop2019<-lapop2019 %>%
+ mutate(index= rowMeans(across(starts_with("b")), na.rm = T)) %>% 
+  mutate(index=index/7)
+
+summary(lapop2019$index)
+```
+
+Análisis gráfico
+
+```{r}
+
+lapop2019 %>% 
+  ggplot(aes(index))+ geom_histogram()
+
+
+
+lapop2019 %>% 
+  ggplot(aes(x=index, y=as_label(idio2)))+ geom_boxplot()+ theme_minimal()
+
+```
+
+Más trucos para usar las etiquetas
+```{r}
+
+lapop2019 %>% 
+  ggplot(aes(x=index, y=as_label(idio2)))+ geom_boxplot()+ theme_minimal()+
+  labs(y=paste(get_label(lapop2019$idio2)))
+```
+
