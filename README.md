@@ -83,3 +83,6 @@ i.	Gráficos multivariados
 [Práctica 3](P3.md)
 
 [Código](P3.R)
+
+[Grabación sesión 3](https://drive.google.com/drive/folders/1AvwgHT0Ljzbhhryd64TzuE3nsHqaKdBa?usp=sharing)
+
